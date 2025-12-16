@@ -82,4 +82,12 @@ classDiagram
 	Window --> GridView
 	GridView --> TileView
 ```
-git push
+## Inner workings
+
+The core classes (Game, Grid, Tile) manage the state and rules of the game. They do not depend on SDL or rendering code.
+The SDL classes (Window, GameObject, GridView, TileView, etc.) are responsible for displaying the game and handling user input. They depend on the core classes to get the current state of the game.
+
+The main loop (in main.cpp or Window) creates an instance of the Game class (from core).
+The GridView and TileView classes (in sdl) receive a reference or pointer to the Grid and Tile objects (from core) to render the current state.
+When the user presses a key, the InputManager (in sdl) translates it into a direction and calls the appropriate method on the Game object (in core), which updates the game state.
+After each update, the SDL classes re-render the new state by querying the core objects.
