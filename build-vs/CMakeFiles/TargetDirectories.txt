@@ -1,3 +1,0 @@
-C:/Users/enola/OneDrive/Desktop/Githubplateforme/2026/CPP/2048-tile-twister/build-vs/CMakeFiles/HelloWorld.dir
-C:/Users/enola/OneDrive/Desktop/Githubplateforme/2026/CPP/2048-tile-twister/build-vs/CMakeFiles/ALL_BUILD.dir
-C:/Users/enola/OneDrive/Desktop/Githubplateforme/2026/CPP/2048-tile-twister/build-vs/CMakeFiles/ZERO_CHECK.dir
