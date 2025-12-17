@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.15)
 if(DEFINED ENV{PROJECT_NAME})
     set(APP_NAME $ENV{PROJECT_NAME})
 else()
-    set(APP_NAME "SDL2App")
+    set(APP_NAME "SDL3App")
 endif()
 
 project(${APP_NAME})
@@ -11,8 +11,8 @@ project(${APP_NAME})
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# Find SDL2
-find_package(SDL2 REQUIRED)
+# Find SDL3
+find_package(SDL3 REQUIRED)
 
 # Create executable
 add_executable(${PROJECT_NAME} src/main.cpp
@@ -20,8 +20,8 @@ add_executable(${PROJECT_NAME} src/main.cpp
     src/Grid.cpp
 )
 
-# Link SDL2
-target_link_libraries(${PROJECT_NAME} PRIVATE SDL2::SDL2main SDL2::SDL2)
+# Link SDL3
+target_link_libraries(${PROJECT_NAME} PRIVATE SDL3::SDL3)
 
 # Windows-specific libraries
 if(WIN32)
@@ -34,15 +34,15 @@ if(WIN32)
     set_target_properties(${PROJECT_NAME} PROPERTIES
         WIN32_EXECUTABLE ON
     )
-    
-    # Copy SDL2 DLL to output directory
+
+    # Copy SDL3 DLL to output directory
     add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_if_different
-        $<TARGET_FILE:SDL2::SDL2>
+        /usr/x86_64-w64-mingw32/bin/SDL3.dll
         $<TARGET_FILE_DIR:${PROJECT_NAME}>
     )
 endif()
 
 # Installation rules
 install(TARGETS ${PROJECT_NAME} DESTINATION .)
-install(FILES $<TARGET_FILE:SDL2::SDL2> DESTINATION . OPTIONAL)
+install(FILES /usr/x86_64-w64-mingw32/bin/SDL3.dll DESTINATION . OPTIONAL)

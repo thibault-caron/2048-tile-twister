@@ -22,17 +22,17 @@ RUN if [ "$TARGET_PLATFORM" = "windows" ]; then \
         apt-get update && apt-get install -y \
         build-essential \
         g++ \
-        libsdl2-dev \
+        libsdl3-dev \
         && rm -rf /var/lib/apt/lists/*; \
     fi
 
-# Download and install SDL2 for Windows cross-compilation
+# Download and install SDL3 for Windows cross-compilation
 RUN if [ "$TARGET_PLATFORM" = "windows" ]; then \
         cd /tmp && \
-        wget https://github.com/libsdl-org/SDL/releases/download/release-2.28.5/SDL2-devel-2.28.5-mingw.tar.gz && \
-        tar -xzf SDL2-devel-2.28.5-mingw.tar.gz && \
-        cp -r SDL2-2.28.5/x86_64-w64-mingw32/* /usr/x86_64-w64-mingw32/ && \
-        rm -rf SDL2-*; \
+        wget https://sourceforge.net/projects/simple-directmedia.mirror/files/release-3.2.28/SDL3-devel-3.2.28-mingw.tar.gz/download -O SDL3-devel-3.2.28-mingw.tar.gz && \
+        tar -xzf SDL3-devel-3.2.28-mingw.tar.gz && \
+        cp -r SDL3-3.2.28/x86_64-w64-mingw32/* /usr/x86_64-w64-mingw32/ && \
+        rm -rf SDL3-*; \
     fi
 
 # Create toolchain file for Windows cross-compilation
@@ -53,5 +53,3 @@ WORKDIR /app
 # Build script
 COPY build.sh ./build.sh
 RUN chmod +x ./build.sh
-
-# CMD ["/build.sh"]
