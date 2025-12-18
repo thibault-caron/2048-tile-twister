@@ -41,33 +41,20 @@ void Window::render() {
 }
 
 void Window::handleEvents() {
-  SDL_Event event;
-  while (SDL_PollEvent(&event)) {
-    if (event.type == SDL_EVENT_QUIT) {
-      running = false;
-    } else if (event.type == SDL_EVENT_KEY_DOWN) {
-      SDL_Keycode key = event.key.key;
-      bool moved = false;
-      switch (key) {
-        case SDLK_LEFT:
-          moved = game.move(Direction::LEFT);
-          break;
-        case SDLK_RIGHT:
-          moved = game.move(Direction::RIGHT);
-          break;
-        case SDLK_UP:
-          moved = game.move(Direction::UP);
-          break;
-        case SDLK_DOWN:
-          moved = game.move(Direction::DOWN);
-          break;
-      }
-      if (moved) {
-        game.addRandomTile();
-        updateGridView();
-      }
+    SDL_Event event;
+    while (SDL_PollEvent(&event)) {
+        if (event.type == SDL_EVENT_QUIT) {
+            running = false;
+        } else if (event.type == SDL_EVENT_KEY_DOWN) {
+            switch (event.key.key) {
+                case SDLK_LEFT:  game.move(Direction::LEFT); break;
+                case SDLK_RIGHT: game.move(Direction::RIGHT); break;
+                case SDLK_UP:    game.move(Direction::UP);    break;
+                case SDLK_DOWN:  game.move(Direction::DOWN);  break;
+            }
+            updateGridView(); // si tu veux rafraîchir l’affichage
+        }
     }
-  }
 }
 
 void Window::loop() {

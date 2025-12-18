@@ -136,3 +136,64 @@ void Grid::addRandomTile() {
 }
 
 // rendering is now handled by GridView
+
+void Grid::mergeTiles(Direction dir) {
+    switch (dir) {
+    case Direction::LEFT:
+        for (int i = 0; i < 4; i++) {
+            for (int j = 0; j < 3; j++) {
+                if (tiles[i][j] != nullptr && tiles[i][j+1] != nullptr &&
+                    tiles[i][j]->getValue() == tiles[i][j+1]->getValue()) {
+                    
+                    tiles[i][j]->setValue(tiles[i][j]->getValue() * 2);
+                    delete tiles[i][j+1];
+                    tiles[i][j+1] = nullptr;
+                }
+            }
+        }
+        break;
+
+    case Direction::RIGHT:
+        for (int i = 0; i < 4; i++) {
+            for (int j = 3; j > 0; j--) {
+                if (tiles[i][j] != nullptr && tiles[i][j-1] != nullptr &&
+                    tiles[i][j]->getValue() == tiles[i][j-1]->getValue()) {
+                    
+                    tiles[i][j]->setValue(tiles[i][j]->getValue() * 2);
+                    delete tiles[i][j-1];
+                    tiles[i][j-1] = nullptr;
+                }
+            }
+        }
+        break;
+
+    case Direction::UP:
+        for (int j = 0; j < 4; j++) {
+            for (int i = 0; i < 3; i++) {
+                if (tiles[i][j] != nullptr && tiles[i+1][j] != nullptr &&
+                    tiles[i][j]->getValue() == tiles[i+1][j]->getValue()) {
+                    
+                    tiles[i][j]->setValue(tiles[i][j]->getValue() * 2);
+                    delete tiles[i+1][j];
+                    tiles[i+1][j] = nullptr;
+                }
+            }
+        }
+        break;
+
+    case Direction::DOWN:
+        for (int j = 0; j < 4; j++) {
+            for (int i = 3; i > 0; i--) {
+                if (tiles[i][j] != nullptr && tiles[i-1][j] != nullptr &&
+                    tiles[i][j]->getValue() == tiles[i-1][j]->getValue()) {
+                    
+                    tiles[i][j]->setValue(tiles[i][j]->getValue() * 2);
+                    delete tiles[i-1][j];
+                    tiles[i-1][j] = nullptr;
+                }
+            }
+        }
+        break;
+    }
+}
+
