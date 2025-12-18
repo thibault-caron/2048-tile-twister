@@ -22,4 +22,6 @@ class Window {
   void handleEvents();
   void loop();
   void updateGridView();
+  void restartGame();
+
 };

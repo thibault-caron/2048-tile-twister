@@ -93,12 +93,29 @@ void Window::render() {
 }
 
 void Window::handleEvents() {
-  if (game.hasWon() || game.isGameOver()) return;
+
     SDL_Event event;
+
     while (SDL_PollEvent(&event)) {
+
         if (event.type == SDL_EVENT_QUIT) {
             running = false;
-        } else if (event.type == SDL_EVENT_KEY_DOWN) {
+            return;
+        }
+
+        if (game.hasWon() || game.isGameOver()) {
+            if (event.type == SDL_EVENT_KEY_DOWN) {
+                if (event.key.key == SDLK_R) {
+                    restartGame();
+                }
+                if (event.key.key == SDLK_ESCAPE || event.key.key == SDLK_Q) {
+                    running = false;
+                }
+            }
+            continue;
+        }
+
+        if (event.type == SDL_EVENT_KEY_DOWN) {
             switch (event.key.key) {
                 case SDLK_LEFT:  game.move(Direction::LEFT); break;
                 case SDLK_RIGHT: game.move(Direction::RIGHT); break;
@@ -109,6 +126,7 @@ void Window::handleEvents() {
         }
     }
 }
+
 
 void Window::loop() {
   while (running) {
@@ -142,4 +160,17 @@ void Window::updateGridView() {
     }
   }
   gridView = new GridView(offsetX, offsetY, gridW, gridH, tileViews);
+}
+
+
+void Window::restartGame() {
+    if (gridView) {
+        delete gridView;
+        gridView = nullptr;
+    }
+
+    game = Game();
+    game.addRandomTile();
+    game.addRandomTile();
+    updateGridView();
 }
