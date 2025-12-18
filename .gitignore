@@ -49,3 +49,6 @@
 **/*SDL3
 
 **/*.vscode
+
+.idea/
+

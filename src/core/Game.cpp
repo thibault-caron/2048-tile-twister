@@ -11,8 +11,8 @@ Grid& Game::getGrid() { return grid; }
 
 void Game::move(Direction dir) {
     if (grid.move(dir)) {
-        grid.mergeTiles(dir);   // fusionner les tuiles
-        grid.move(dir);         // recoller après fusion
-        addRandomTile();        // ajouter une nouvelle tuile
+        grid.mergeTiles(dir);   
+        grid.move(dir);         
+        addRandomTile();        
     }
 }
