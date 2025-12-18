@@ -2,12 +2,12 @@
 #include "grid.hpp"
 
 class Game {
-private:
-    Grid grid;
+ private:
+  Grid grid;
 
-public:
-    void move(Direction dir);
-    void addRandomTile();
-    bool isGameOver() const;
-    Grid& getGrid();
+ public:
+  bool move(Direction dir);
+  void addRandomTile();
+  bool isGameOver() const;
+  Grid& getGrid();
 };

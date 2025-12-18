@@ -35,6 +35,15 @@ RUN if [ "$TARGET_PLATFORM" = "windows" ]; then \
         rm -rf SDL3-*; \
     fi
 
+# Download and install SDL_ttf for Windows cross-compilation
+RUN if [ "$TARGET_PLATFORM" = "windows" ]; then \
+    cd /tmp && \
+    wget https://github.com/libsdl-org/SDL_ttf/releases/download/release-3.2.2/SDL3_ttf-devel-3.2.2-mingw.tar.gz  -O SDL3_ttf-devel-mingw.tar.gz && \
+    tar -xzf SDL3_ttf-devel-mingw.tar.gz && \
+    cp -r SDL3_ttf-3.2.2/x86_64-w64-mingw32/* /usr/x86_64-w64-mingw32/ && \
+    rm -rf SDL3_ttf-*; \
+fi
+
 # Create toolchain file for Windows cross-compilation
 RUN if [ "$TARGET_PLATFORM" = "windows" ]; then \
         echo 'set(CMAKE_SYSTEM_NAME Windows)' > /toolchain.cmake && \

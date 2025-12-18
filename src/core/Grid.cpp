@@ -1,169 +1,134 @@
 #include "grid.hpp"
+
 #include <cstdlib>
 #include <ctime>
 
 Grid::Grid() {
-    for (int i = 0; i < 4; i++)
-        for (int j = 0; j < 4; j++)
-            tiles[i][j] = nullptr;
+  for (int i = 0; i < 4; i++)
+    for (int j = 0; j < 4; j++) tiles[i][j] = nullptr;
 }
 
-
 bool Grid::move(Direction dir) {
-    bool moved = false;
+  bool moved = false;
 
-    switch (dir) {
-    case Direction::LEFT:
-        for (int i = 0; i < 4; i++) {
-            int target = 0;
-            for (int j = 0; j < 4; j++) {
-                if (tiles[i][j] != nullptr) {
-                    if (j != target) {
-                        tiles[i][target] = tiles[i][j];
-                        tiles[i][target]->setPosition(i, target); // upload
-                        tiles[i][j] = nullptr;
-                        moved = true;
-                    }
-                    target++;
-                }
-            }
+  auto slideAndMerge = [&](auto get, auto set) {
+    for (int i = 0; i < 4; ++i) {
+      // Slide tiles
+      int pos = 0;
+      for (int j = 0; j < 4; ++j) {
+        Tile* t = get(i, j);
+        if (t) {
+          if (j != pos) {
+            set(i, pos, t);
+            set(i, j, nullptr);
+            t->setPosition(
+                (dir == Direction::LEFT || dir == Direction::RIGHT) ? i : pos,
+                (dir == Direction::LEFT || dir == Direction::RIGHT) ? pos : i);
+            moved = true;
+          }
+          pos++;
         }
-        break;
-
-    case Direction::RIGHT:
-        for (int i = 0; i < 4; i++) {
-            int target = 3;
-            for (int j = 3; j >= 0; j--) {
-                if (tiles[i][j] != nullptr) {
-                    if (j != target) {
-                        tiles[i][target] = tiles[i][j];
-                        tiles[i][target]->setPosition(i, target); // upload
-                        tiles[i][j] = nullptr;
-                        moved = true;
-                    }
-                    target--;
-                }
-            }
+      }
+      // Merge tiles
+      for (int j = 0; j < 3; ++j) {
+        Tile* t1 = get(i, j);
+        Tile* t2 = get(i, j + 1);
+        if (t1 && t2 && t1->getValue() == t2->getValue()) {
+          t1->setValue(t1->getValue() * 2);
+          delete t2;
+          set(i, j + 1, nullptr);
+          moved = true;
         }
-        break;
-
-    case Direction::UP:
-        for (int j = 0; j < 4; j++) {
-            int target = 0;
-            for (int i = 0; i < 4; i++) {
-                if (tiles[i][j] != nullptr) {
-                    if (i != target) {
-                        tiles[target][j] = tiles[i][j];
-                        tiles[target][j]->setPosition(target, j); // upload
-                        tiles[i][j] = nullptr;
-                        moved = true;
-                    }
-                    target++;
-                }
-            }
+      }
+      // Slide again after merge
+      pos = 0;
+      for (int j = 0; j < 4; ++j) {
+        Tile* t = get(i, j);
+        if (t) {
+          if (j != pos) {
+            set(i, pos, t);
+            set(i, j, nullptr);
+            t->setPosition(
+                (dir == Direction::LEFT || dir == Direction::RIGHT) ? i : pos,
+                (dir == Direction::LEFT || dir == Direction::RIGHT) ? pos : i);
+          }
+          pos++;
         }
-        break;
-
-    case Direction::DOWN:
-        for (int j = 0; j < 4; j++) {
-            int target = 3;
-            for (int i = 3; i >= 0; i--) {
-                if (tiles[i][j] != nullptr) {
-                    if (i != target) {
-                        tiles[target][j] = tiles[i][j];
-                        tiles[target][j]->setPosition(target, j); // upload
-                        tiles[i][j] = nullptr;
-                        moved = true;
-                    }
-                    target--;
-                }
-            }
-        }
-        break;
+      }
     }
+  };
 
-    return moved;
+  switch (dir) {
+    case Direction::LEFT:
+      slideAndMerge([&](int i, int j) { return tiles[i][j]; },
+                    [&](int i, int j, Tile* t) { tiles[i][j] = t; });
+      break;
+    case Direction::RIGHT:
+      slideAndMerge([&](int i, int j) { return tiles[i][3 - j]; },
+                    [&](int i, int j, Tile* t) { tiles[i][3 - j] = t; });
+      break;
+    case Direction::UP:
+      slideAndMerge([&](int i, int j) { return tiles[j][i]; },
+                    [&](int i, int j, Tile* t) { tiles[j][i] = t; });
+      break;
+    case Direction::DOWN:
+      slideAndMerge([&](int i, int j) { return tiles[3 - j][i]; },
+                    [&](int i, int j, Tile* t) { tiles[3 - j][i] = t; });
+      break;
+  }
+
+  return moved;
 }
 
 bool Grid::canMove() const {
-    // Case vide ?
-    for (int i = 0; i < 4; i++) {
-        for (int j = 0; j < 4; j++) {
-            if (tiles[i][j] == nullptr) return true;
-        }
+  // Case vide ?
+  for (int i = 0; i < 4; i++) {
+    for (int j = 0; j < 4; j++) {
+      if (tiles[i][j] == nullptr) return true;
     }
+  }
 
-    // Fusion possible ?
-    for (int i = 0; i < 4; i++) {
-        for (int j = 0; j < 4; j++) {
-            if (tiles[i][j] != nullptr) {
-                if (i < 3 && tiles[i+1][j] != nullptr &&
-                    tiles[i][j]->getValue() == tiles[i+1][j]->getValue())
-                    return true;
-                if (j < 3 && tiles[i][j+1] != nullptr &&
-                    tiles[i][j]->getValue() == tiles[i][j+1]->getValue())
-                    return true;
-            }
-        }
+  // Fusion possible ?
+  for (int i = 0; i < 4; i++) {
+    for (int j = 0; j < 4; j++) {
+      if (tiles[i][j] != nullptr) {
+        if (i < 3 && tiles[i + 1][j] != nullptr &&
+            tiles[i][j]->getValue() == tiles[i + 1][j]->getValue())
+          return true;
+        if (j < 3 && tiles[i][j + 1] != nullptr &&
+            tiles[i][j]->getValue() == tiles[i][j + 1]->getValue())
+          return true;
+      }
     }
+  }
 
-    return false;
+  return false;
 }
 
-
 void Grid::addTile(Tile* tile) {
-    if (tile) {
-        int x = tile->getPosition().first;
-        int y = tile->getPosition().second;
-        tiles[x][y] = tile;
-    }
+  if (tile) {
+    int x = tile->getPosition().first;
+    int y = tile->getPosition().second;
+    tiles[x][y] = tile;
+  }
 }
 
 void Grid::addRandomTile() {
-    std::vector<std::pair<int,int>> emptyCells;
-    for (int i = 0; i < 4; i++) {
-        for (int j = 0; j < 4; j++) {
-            if (tiles[i][j] == nullptr) {
-                emptyCells.push_back({i,j});
-            }
-        }
+  std::vector<std::pair<int, int>> emptyCells;
+  for (int i = 0; i < 4; i++) {
+    for (int j = 0; j < 4; j++) {
+      if (tiles[i][j] == nullptr) {
+        emptyCells.push_back({i, j});
+      }
     }
+  }
 
-    if (!emptyCells.empty()) {
-        std::srand(static_cast<unsigned int>(std::time(nullptr)));
-        auto [i,j] = emptyCells[std::rand() % emptyCells.size()];
-        int val = (std::rand() % 2 == 0) ? 2 : 4;
-        tiles[i][j] = new Tile(val, i, j);
-    }
+  if (!emptyCells.empty()) {
+    std::srand(static_cast<unsigned int>(std::time(nullptr)));
+    auto [i, j] = emptyCells[std::rand() % emptyCells.size()];
+    int val = (std::rand() % 2 == 0) ? 2 : 4;
+    tiles[i][j] = new Tile(val, i, j);
+  }
 }
 
-void Grid::render(SDL_Renderer* renderer) const {
-    int cellSize = 100;
-
-    int winW, winH;
-    SDL_GetRenderOutputSize(renderer, &winW, &winH);
-
-    int gridW = 4 * cellSize;
-    int gridH = 4 * cellSize;
-
-    int offsetX = (winW - gridW) / 2;
-    int offsetY = (winH - gridH) / 2;
-
-    for (int i = 0; i < 4; i++) {
-        for (int j = 0; j < 4; j++) {
-            SDL_FRect rect { 
-                static_cast<float>(offsetX + j * cellSize), //X
-                static_cast<float>(offsetY + i * cellSize), //Y
-                static_cast<float>(cellSize), // weight
-                static_cast<float>(cellSize) //height
-            };
-
-            if (tiles[i][j] != nullptr) {
-                SDL_SetRenderDrawColor(renderer, 255, 200, 0, 255); // yellow
-            } else {
-                SDL_SetRenderDrawColor(renderer, 200, 200, 200, 255); // gray
-            }
-            SDL_RenderFillRect(renderer, &rect);
-        }
-    }
-}
+// rendering is now handled by GridView

@@ -13,6 +13,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # Find SDL3
 find_package(SDL3 REQUIRED)
+find_package(SDL3_ttf REQUIRED)
 
 # Create executable
 add_executable(${PROJECT_NAME} src/main.cpp
@@ -20,10 +21,13 @@ add_executable(${PROJECT_NAME} src/main.cpp
     src/core/grid.cpp
     src/views/window.cpp
     src/core/game.cpp
+    src/views/tileView.cpp
+    src/views/gridView.cpp
+    src/views/gameObject.cpp
 )
 
 # Link SDL3
-target_link_libraries(${PROJECT_NAME} PRIVATE SDL3::SDL3)
+target_link_libraries(${PROJECT_NAME} PRIVATE SDL3::SDL3 SDL3_ttf::SDL3_ttf)
 
 # Windows-specific libraries
 if(WIN32)
@@ -41,6 +45,15 @@ if(WIN32)
     add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_if_different
         /usr/x86_64-w64-mingw32/bin/SDL3.dll
+        $<TARGET_FILE_DIR:${PROJECT_NAME}>
+    )
+endif()
+
+# Copy SDL3_ttf DLL to output directory
+if(WIN32)
+    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        /usr/x86_64-w64-mingw32/bin/SDL3_ttf.dll
         $<TARGET_FILE_DIR:${PROJECT_NAME}>
     )
 endif()

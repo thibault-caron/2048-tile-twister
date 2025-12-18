@@ -1,17 +1,9 @@
 #include "game.hpp"
 
-void Game::move(Direction dir) {
-    grid.move(dir);
-}
+bool Game::move(Direction dir) { return grid.move(dir); }
 
-void Game::addRandomTile() {
-    grid.addRandomTile();
-}
+void Game::addRandomTile() { grid.addRandomTile(); }
 
-bool Game::isGameOver() const {
-    return !grid.canMove();
-}
+bool Game::isGameOver() const { return !grid.canMove(); }
 
-Grid& Game::getGrid() {
-    return grid;
-}
+Grid& Game::getGrid() { return grid; }
