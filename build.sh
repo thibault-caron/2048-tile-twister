@@ -2,41 +2,80 @@
 
 set -e
 
-echo "Building for platform: ${TARGET_PLATFORM:-windows}"
+echo "================================================"
+echo "Step 1: Building and Running Tests (Linux)"
+echo "================================================"
 
-# Create build directory
-if [ -d "build" ]; then
-    rm -r build
+# Build tests natively on Linux first
+mkdir -p build-test
+cd build-test
+
+echo "Configuring tests..."
+cmake -DCMAKE_BUILD_TYPE=Release \
+      -DBUILD_TESTS_ONLY=ON \
+      ..
+
+echo "Building test executable..."
+make test
+
+echo ""
+echo "Running tests..."
+./test
+
+TEST_RESULT=$?
+
+if [ $TEST_RESULT -ne 0 ]; then
+    echo ""
+    echo "❌ Tests FAILED! Aborting build."
+    exit 1
 fi
 
+echo ""
+echo "✅ All tests PASSED!"
+echo ""
+
+cd ..
+rm -rf build-test
+
+echo "================================================"
+echo "Step 2: Building Windows Executable"
+echo "================================================"
+
+# Now build for Windows
 mkdir -p build
 cd build
 
-# Configure CMake based on platform
 if [ "${TARGET_PLATFORM}" = "linux" ]; then
     echo "Configuring for Linux..."
     cmake -DCMAKE_BUILD_TYPE=Release ..
     make
 
-    # Create distribution directory
     mkdir -p /app/dist-linux
-    cp $PROJECT_NAME /app/dist-linux/
+    cp ${PROJECT_NAME} /app/dist-linux/
 
-    echo "✓ Linux build complete! Executable in dist-linux/ folder"
-    echo "  Note: Linux executable requires SDL3 to be installed on target system:"
-    echo "  sudo apt-get install libsdl3-dev"
+    echo ""
+    echo "✅ Linux build complete! Executable in dist-linux/"
 
 else
     echo "Configuring for Windows..."
     cmake -DCMAKE_TOOLCHAIN_FILE=/toolchain.cmake \
-          -DCMAKE_BUILD_TYPE=Release ..
-    make
+          -DCMAKE_BUILD_TYPE=Release \
+          -DBUILD_TESTS_ONLY=OFF \
+          ..
+    
+    # Build only the main application, NOT the tests
+    make ${PROJECT_NAME}
 
-    # Create distribution directory
     mkdir -p /app/dist-windows
-    cp $PROJECT_NAME.exe /app/dist-windows/
+    cp ${PROJECT_NAME}.exe /app/dist-windows/
     cp /usr/x86_64-w64-mingw32/bin/SDL3.dll /app/dist-windows/
+    cp /usr/x86_64-w64-mingw32/bin/SDL3_ttf.dll /app/dist-windows/
 
-    echo "✓ Windows build complete! Executable and DLL in dist-windows/ folder"
-    echo "  Ready to run on Windows without any installation!"
+    echo ""
+    echo "✅ Windows build complete! Executable and DLLs in dist-windows/"
 fi
+
+echo ""
+echo "================================================"
+echo "BUILD SUCCESSFUL!"
+echo "================================================"

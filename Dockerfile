@@ -6,23 +6,30 @@ ARG TARGET_PLATFORM=windows
 
 # Install common build tools
 RUN apt-get update && apt-get install -y \
+    build-essential \
+    g++ \
     cmake \
     make \
     wget \
+    git \
     unzip \
     && rm -rf /var/lib/apt/lists/*
+
+# Install doctest header (for testing)
+RUN wget -O /usr/local/include/doctest.h \
+    https://raw.githubusercontent.com/doctest/doctest/master/doctest/doctest.h
 
 # Install platform-specific tools
 RUN if [ "$TARGET_PLATFORM" = "windows" ]; then \
         apt-get update && apt-get install -y \
         mingw-w64 \
-        g++-mingw-w64-x86-64 \
+        gcc-mingw-w64-x86-64-posix \
+        g++-mingw-w64-x86-64-posix \
         && rm -rf /var/lib/apt/lists/*; \
     else \
         apt-get update && apt-get install -y \
-        build-essential \
-        g++ \
         libsdl3-dev \
+        libsdl3-ttf-dev \
         && rm -rf /var/lib/apt/lists/*; \
     fi
 
@@ -38,7 +45,7 @@ RUN if [ "$TARGET_PLATFORM" = "windows" ]; then \
 # Download and install SDL_ttf for Windows cross-compilation
 RUN if [ "$TARGET_PLATFORM" = "windows" ]; then \
     cd /tmp && \
-    wget https://github.com/libsdl-org/SDL_ttf/releases/download/release-3.2.2/SDL3_ttf-devel-3.2.2-mingw.tar.gz  -O SDL3_ttf-devel-mingw.tar.gz && \
+    wget https://github.com/libsdl-org/SDL_ttf/releases/download/release-3.2.2/SDL3_ttf-devel-3.2.2-mingw.tar.gz -O SDL3_ttf-devel-mingw.tar.gz && \
     tar -xzf SDL3_ttf-devel-mingw.tar.gz && \
     cp -r SDL3_ttf-3.2.2/x86_64-w64-mingw32/* /usr/x86_64-w64-mingw32/ && \
     rm -rf SDL3_ttf-*; \
