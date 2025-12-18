@@ -5,6 +5,11 @@
 #include <SDL3_ttf/SDL_ttf.h>
 
 #include <string>
+TileView::TileView(int x, int y, int width, int height, int value)
+    : GameObject(x, y, width, height), value(value) {}
+
+void TileView::setValue(int newValue) { this->value = newValue; }
+int TileView::getValue() { return this->value; }
 
 void TileView::render(SDL_Renderer* renderer) {
   // Draw tile rectangle
@@ -19,8 +24,8 @@ void TileView::render(SDL_Renderer* renderer) {
   if (value > 0) {
     TTF_Font* font = TTF_OpenFont("./assets/Roboto-Bold.ttf", height / 2);
     if (!font) {
-    std::cerr << "Failed to load font: " << SDL_GetError() << std::endl;
-}
+      std::cerr << "Failed to load font: " << SDL_GetError() << std::endl;
+    }
     if (font) {
       SDL_Color textColor = {50, 50, 50, 255};
       std::string valStr = std::to_string(value);

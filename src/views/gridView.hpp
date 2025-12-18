@@ -11,8 +11,7 @@ class GridView : public GameObject {
 
  public:
   GridView(int x, int y, int width, int height,
-           const std::vector<TileView>& tiles)
-      : GameObject(x, y, width, height), tiles(tiles) {}
-  void setTiles(const std::vector<TileView>& newTiles) { tiles = newTiles; }
+           const std::vector<TileView>& tiles);
+  void setTiles(const std::vector<TileView>& newTiles);
   void render(SDL_Renderer* renderer) override;
 };
