@@ -80,6 +80,64 @@ docker-compose up
 
 ## 📁 Architecture
 
+### Class diagram
+
+```mermaid
+classDiagram
+	class Game {
+		-Grid grid
+		+void move(Direction)
+		+void addRandomTile()
+		+bool isGameOver()
+	}
+	class Grid {
+		-Tile[4][4] tiles
+		+bool move(Direction)
+		+bool canMove()
+		+void mergeTiles(Direction)
+		+void addTile(Tile)
+	}
+	class Tile {
+		-int value
+		-int x
+		-int y
+		+int getValue()
+		+(x, y) getPosition()
+	}
+	class Window {
+		+void init()
+		+void render()
+		+void handleEvents()
+	}
+	class GameObject {
+		<<abstract>>
+		-int x
+		-int y
+		-int width
+		-int height
+		+virtual void render()
+	}
+	class TileView {
+		+void render()
+	}
+	class GridView {
+		+void render()
+	}
+	class InputManager {
+		+Direction getInput()
+	}
+	Game --> Grid
+	Grid --> Tile
+	Window --> GameObject
+	TileView --|> GameObject
+	GridView --|> GameObject
+	Window --> InputManager
+	Window --> GridView
+	GridView --> TileView
+```
+
+### File tree
+
 ```
 2048-tile-twister/
 ├── 📂 src/
