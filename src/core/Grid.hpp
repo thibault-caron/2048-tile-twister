@@ -1,6 +1,6 @@
 
 // #include <SDL3/SDL.h>
-
+#pragma once
 #include <vector>
 
 #include "tile.hpp"

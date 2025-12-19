@@ -6,7 +6,8 @@ class Game {
   Grid grid;
 
  public:
- void move(Direction dir); 
+  void setGrid(Grid& grid);
+  void move(Direction dir); 
   void addRandomTile();
   bool isGameOver() const;
   bool hasWon() const;

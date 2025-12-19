@@ -18,6 +18,7 @@ bool Grid::move(Direction dir) {
   return moved;
 }
 
+
 void Grid::slideTiles(Direction dir, bool& moved) {
   switch (dir) {
     case Direction::LEFT:
